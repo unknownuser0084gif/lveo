@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Lveo — یه چیزی برات دارم</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/Tone.js" onerror="window.__toneFailed = true"></script>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div id="app">
+  <div class="progress" id="progress">
+    <span class="dot active" data-i="0"></span>
+    <span class="dot" data-i="1"></span>
+    <span class="dot" data-i="2"></span>
+    <span class="dot" data-i="3"></span>
+    <span class="dot" data-i="4"></span>
+    <span class="dot" data-i="5"></span>
+    <span class="dot" data-i="6"></span>
+    <span class="dot" data-i="7"></span>
+    <span class="dot" data-i="8"></span>
+    <span class="dot" data-i="9"></span>
+  </div>
+
+  <div class="card">
+
+    <!-- Stage 0: intro -->
+    <section class="stage active" data-stage="0">
+      <div class="logo">Lveo</div>
+      <div class="logo-sub">a site made only for you</div>
+
+      <div id="introStep1">
+        <p class="sub">امشب اینجا کلی سوپرایز چیده شده — رنگ، آهنگ، یه بازی کوچولو و یه سوال مهم. ولی اول از همه...</p>
+        <div class="field">
+          <label for="herName">اسمتو بنویس (فارسی یا انگلیسی، فرقی نداره)</label>
+          <input type="text" id="herName" placeholder="مثلاً سارا یا Sara">
+        </div>
+        <button class="btn" id="makeUrlBtn">بریم</button>
+      </div>
+
+      <div id="introStep2" class="hidden">
+        <p class="sub" id="welcomeLine">خوش اومدی! این سایت فقط مال خودته.</p>
+        <p class="joke-line" id="introJoke">یه نکته: این سایت مسئولیتی در قبال ضربان قلب شما نمی‌پذیرد 💓</p>
+        <button class="joke-btn" id="jokeBtn" type="button">یه شوخی دیگه بگو</button>
+        <button class="btn" onclick="goTo(1)">خب بریم که بریم</button>
+      </div>
+    </section>
+
+    <!-- Stage 1: color -->
+    <section class="stage" data-stage="1">
+      <span class="emoji-lead">🎨</span>
+      <h1>رنگِ موردعلاقت چیه؟</h1>
+      <p class="sub">همین که انتخاب کنی، کل این صفحه می‌شه همون رنگ. بی‌مقدمه.</p>
+      <div class="swatches" id="swatches"></div>
+      <p class="joke-caption" id="colorJoke"></p>
+      <div class="custom-color-row">
+        <input type="color" id="customColor" value="#FF5D8F">
+        <label for="customColor">یا یه رنگ دیگه انتخاب کن</label>
+      </div>
+    </section>
+
+    <!-- Stage 2: music -->
+    <section class="stage" data-stage="2">
+      <span class="emoji-lead">🎧</span>
+      <h1>حالا سبک موزیکت چیه؟</h1>
+      <p class="sub">یه ملودی کوچولو از همون سبک، همین‌جا واست می‌سازم و پلی می‌کنم.</p>
+      <div class="genre-grid" id="genres"></div>
+      <div class="now-playing muted" id="nowPlaying">
+        <div class="bars"><span></span><span></span><span></span><span></span></div>
+        <span id="nowPlayingText">یه سبک انتخاب کن تا پلی بشه</span>
+      </div>
+      <p class="lyric-box" id="lyricBox"></p>
+      <p class="joke-caption" id="genreJoke"></p>
+      <button class="btn" onclick="goTo(3)">قشنگ بود، بعدی</button>
+    </section>
+
+    <!-- Stage 3: yes/no checkpoint -->
+    <section class="stage" data-stage="3">
+      <span class="emoji-lead">🤔</span>
+      <h1>تا اینجا خوشت اومده؟</h1>
+      <p class="sub">فقط با صداقت جواب بده...</p>
+      <div class="yn-row">
+        <button class="btn yn-yes" id="ynYes">آره 😍</button>
+        <button class="yn-no" id="ynNo">نه</button>
+      </div>
+    </section>
+
+    <!-- Stage 4: confession -->
+    <section class="stage" data-stage="4">
+      <span class="emoji-lead beat">💌</span>
+      <div class="scratch-wrap" id="scratchWrap">
+        <div class="confess-lines">
+          <p>راستش این سایت بهونه بود.</p>
+          <p>می‌خواستم یه‌جوری بهت بگم که از وقتی دیدمت، حواسم پرته —</p>
+          <p>دقیقاً به همون اندازه که این صفحه الان رنگ و آهنگِ تو رو گرفته.</p>
+          <p>خلاصه‌ش کنم: از تو خوشم اومده. زیاد. 😊</p>
+        </div>
+        <canvas class="scratch-canvas" id="scratchCanvas"></canvas>
+      </div>
+      <p class="joke-line">ترسناک نیست، فقط یه اعتراف با ساندترک بود 🎬</p>
+      <button class="btn" onclick="tryLeaveConfession()">یه سوپرایز کوچولو قبل از ادامه 🎮</button>
+    </section>
+
+    <!-- Stage 5: game choice -->
+    <section class="stage" data-stage="5">
+      <span class="emoji-lead">🎮</span>
+      <h1>یه بازی کوچولو قبل از ادامه</h1>
+      <p class="sub">کدومو دوست داری؟</p>
+      <button class="btn choice-btn preview-btn" id="btnPickGame1">
+        <canvas class="choice-preview" id="previewGame1" width="300" height="70"></canvas>
+        <span class="choice-btn-label">دزدین قلب 🗡️ — بازی یک</span>
+      </button>
+      <button class="btn choice-btn preview-btn" id="btnPickGame2">
+        <canvas class="choice-preview" id="previewGame2" width="300" height="70"></canvas>
+        <span class="choice-btn-label">شکار قلب 🏹 — بازی دو</span>
+      </button>
+    </section>
+
+    <!-- Stage 6: mini game 1 (platformer) -->
+    <section class="stage" data-stage="6">
+      <span class="emoji-lead">🎮</span>
+      <h1>برو قلبمو بگیر</h1>
+      <p class="sub">با دکمه‌ها حرکت کن، از موانع رد شو، سه‌تا جون داری.</p>
+      <div class="game-hearts" id="gameLives">❤️❤️❤️</div>
+      <canvas id="gameCanvas" width="600" height="260"></canvas>
+      <div class="game-controls">
+        <button class="game-btn" id="btnLeft">◀</button>
+        <button class="game-btn" id="btnJump">بپر</button>
+        <button class="game-btn" id="btnRight">▶</button>
+      </div>
+      <button class="btn ghost" id="btnSkipGame">بعداً بازی می‌کنم</button>
+    </section>
+
+    <!-- Stage 7: mini game 2 (archery) -->
+    <section class="stage" data-stage="7">
+      <span class="emoji-lead">🏹</span>
+      <h1>شکار قلب</h1>
+      <p class="sub">بکش عقب، نشونه بگیر، از لای دیوار رد کن بزن به قلب. ۵ تیر داری.</p>
+      <div class="game-hearts" id="archeryShots">🏹🏹🏹🏹🏹</div>
+      <canvas id="archeryCanvas" width="600" height="260"></canvas>
+      <button class="btn ghost" id="btnSkipGame2">بعداً بازی می‌کنم</button>
+    </section>
+
+    <!-- Stage 8: date planning -->
+    <section class="stage" data-stage="8">
+      <span class="emoji-lead">📅</span>
+      <h1>بریم یه قرار بذاریم؟</h1>
+      <p class="sub">دوست داری کجا باشه، کِی باشه — خودت انتخاب کن، من پایه‌ام.</p>
+      <div class="field" id="activityField">
+        <label>چی بخوریم؟</label>
+        <div class="chip-row" id="activityChips"></div>
+      </div>
+      <div class="field" id="placeField">
+        <label>کجا بریم؟</label>
+        <div class="chip-row" id="placeChips"></div>
+      </div>
+      <div class="field" id="flowerField">
+        <label>چه نوع گلی دوست داری؟</label>
+        <div class="chip-row" id="flowerChips"></div>
+      </div>
+      <div class="field" id="dateField">
+        <label>تاریخ (شمسی)</label>
+        <div class="date-row">
+          <select id="dayInput"></select>
+          <select id="monthInput"></select>
+          <select id="yearInput"></select>
+        </div>
+      </div>
+      <div class="field" id="timeField">
+        <label>ساعت (۲۴ ساعته)</label>
+        <div class="date-row time-row">
+          <select id="hourInput"></select>
+          <span class="time-colon">:</span>
+          <select id="minuteInput"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="noteInput">یه چیزی بگو (اختیاری)</label>
+        <textarea id="noteInput" placeholder="مثلاً: فقط دیر نکن 😅"></textarea>
+      </div>
+      <button class="btn" onclick="submitDate()">بفرستش</button>
+    </section>
+
+    <!-- Stage 9: done -->
+    <section class="stage" data-stage="9">
+      <div class="done-emoji beat">🎉</div>
+      <h1 class="done-title" id="doneTitle">مبارکه</h1>
+      <p class="sub done-sub">قرار رو یادداشت کردم. به‌زودی می‌بینمت 😘</p>
+      <p class="countdown" id="countdownDisplay"></p>
+      <p class="joke-line" id="finalJoke"></p>
+
+      <div class="social-row">
+        <div class="social-item">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="none"><path d="M21 4L2.5 11.5l6 2 2 6.5 3-4 4.5 3.5L21 4Z" stroke="#229ED9" stroke-width="1.6" stroke-linejoin="round" fill="#e8f6fc"/></svg>
+          <span>تلگرام: <span id="telId"></span></span>
+        </div>
+        <div class="social-item">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#E1306C" stroke-width="1.6" fill="#fdeaf1"/><circle cx="12" cy="12" r="4" stroke="#E1306C" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="#E1306C"/></svg>
+          <span>اینستا: <span id="instaId"></span></span>
+        </div>
+      </div>
+
+      <div id="contactAsk">
+        <button class="btn" id="showContactFieldBtn">اگه توام تمایل داری آیدی یا شماره بدی کلیک کن 😅</button>
+      </div>
+      <div id="contactForm" class="hidden">
+        <div class="field">
+          <label for="contactInput">آیدی تلگرامت یا شماره‌ت</label>
+          <input type="text" id="contactInput" placeholder="مثلاً @username یا 0912...">
+        </div>
+        <button class="btn" id="sendContactBtn">ارسال</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<button class="admin-gear" id="adminGear" title="">⚙</button>
+<button class="mute-btn" id="muteBtn" title="">🔊</button>
+<div class="admin-modal hidden" id="pinModal">
+  <div class="admin-box pin-box">
+    <h2>رمز عبور</h2>
+    <p class="empty-note pin-note">۴ رقم رمز رو وارد کن</p>
+    <div class="pin-row">
+      <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" id="pin1">
+      <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" id="pin2">
+      <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" id="pin3">
+      <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" id="pin4">
+    </div>
+    <button class="btn" id="pinSubmitBtn">تایید</button>
+    <button class="btn ghost admin-close" id="pinCancelBtn">انصراف</button>
+  </div>
+</div>
+<div class="admin-modal hidden" id="adminModal">
+  <div class="admin-box">
+    <div class="admin-section-head">
+      <h2>جواب‌هایی که ثبت شده</h2>
+      <button class="btn-delete-all" id="deleteAllResponsesBtn">حذف همه</button>
+    </div>
+    <div id="adminList"></div>
+    <div class="admin-section-head">
+      <h2>آیدی/شماره‌هایی که فرستاده</h2>
+      <button class="btn-delete-all" id="deleteAllContactsBtn">حذف همه</button>
+    </div>
+    <div id="adminContactList"></div>
+    <button class="btn admin-close" onclick="closeAdmin()">بستن</button>
+  </div>
+</div>
+
+<div class="win-overlay hidden" id="winOverlay">
+  <div class="win-box">
+    <div id="winGraphicSlot"></div>
+    <p class="win-text" id="winTextEl">میدونستی الان قلب منو دزدیدی؟ 💘</p>
+    <button class="btn" id="winContinueBtn">باشه، ادامه بده</button>
+    <div id="winActions" class="hidden">
+      <button class="btn" id="winReplayBtn">برو به صفحه‌ی بازی‌ها</button>
+      <button class="btn ghost" id="winNextBtn">بریم واسه سوپرایز بعدی</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const TEL_ID = "vmozi";
+const INSTA_ID = "mahdimoozi";
+document.getElementById('telId').textContent = TEL_ID;
+document.getElementById('instaId').textContent = INSTA_ID;
+
+/* ---------------- stage navigation ---------------- */
+const stages = document.querySelectorAll('.stage');
+const dots = document.querySelectorAll('.dot');
+let current = 0;
+
+function goTo(n){
+  if(current === 5 && n !== 5) stopPreviews();
+  if(current === 6 && n !== 6) stopGameLoop();
+  if(current === 7 && n !== 7) stopArcheryLoop();
+  stages[current].classList.remove('active');
+  dots[current].classList.add('done');
+  dots[current].classList.remove('active');
+  current = n;
+  stages[current].classList.add('active');
+  dots[current].classList.add('active');
+  if(n === 4){ setupScratchCard(); }
+  if(n === 5){ startPreviews(); }
+  if(n === 6){ ensureGameInit(); resetGame(); startGameLoop(); }
+  if(n === 7){ ensureArcheryInit(); resetArchery(); startArcheryLoop(); }
+}
+
+/* ---------------- toast ---------------- */
+function vibrate(pattern){
+  try{ if(navigator.vibrate) navigator.vibrate(pattern); } catch(e){}
+}
+function markInvalid(fieldId){
+  const el = document.getElementById(fieldId);
+  if(el) el.classList.add('invalid');
+}
+function clearInvalid(fieldId){
+  const el = document.getElementById(fieldId);
+  if(el) el.classList.remove('invalid');
+}
+function tryLeaveConfession(){
+  if(scratchDone || scratchWarned){
+    goTo(5);
+    return;
+  }
+  scratchWarned = true;
+  vibrate([40]);
+  markInvalid('scratchWrap');
+  showToast('اون قسمت رو بخراش، مطمئنم پشیمون نمی‌شی 😏');
+}
+
+/* ---------------- scratch-to-reveal confession ---------------- */
+let scratchDone = false;
+let scratchWarned = false;
+function setupScratchCard(){
+  scratchDone = false;
+  scratchWarned = false;
+  clearInvalid('scratchWrap');
+  const oldCanvas = document.getElementById('scratchCanvas');
+  const canvas = oldCanvas.cloneNode(false);
+  canvas.id = 'scratchCanvas';
+  oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
+  canvas.classList.remove('faded');
+
+  const wrap = document.getElementById('scratchWrap');
+  const rect = wrap.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = rect.width, h = rect.height;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#FF5D8F';
+  const accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent2').trim() || '#FFC145';
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, accent);
+  grad.addColorStop(1, accent2);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.globalAlpha = 0.16;
+  ctx.font = '18px sans-serif';
+  for(let i=0; i<12; i++){
+    ctx.fillText('💗', Math.random()*w, Math.random()*h);
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 15px Vazirmatn, sans-serif';
+  ctx.fillText('با انگشتت بکش رو صفحه 👆', w/2, h/2 - 6);
+  ctx.font = '13px Vazirmatn, sans-serif';
+  ctx.fillText('یه چیزی زیرشه...', w/2, h/2 + 16);
+
+  let drawing = false;
+  let moveCount = 0;
+
+  const getPos = (e)=>{
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - r.left, y: clientY - r.top };
+  };
+  const erase = (x, y)=>{
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+  };
+  const revealAll = ()=>{
+    if(scratchDone) return;
+    scratchDone = true;
+    clearInvalid('scratchWrap');
+    canvas.classList.add('faded');
+    vibrate([80,40,80]);
+  };
+  const checkProgress = ()=>{
+    if(scratchDone) return;
+    moveCount++;
+    if(moveCount % 6 !== 0) return;
+    try{
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let cleared = 0, total = 0;
+      for(let i=3; i<data.length; i += 4*25){
+        total++;
+        if(data[i] < 20) cleared++;
+      }
+      if(total > 0 && cleared/total > 0.4) revealAll();
+    } catch(e){}
+  };
+  const down = (e)=>{ e.preventDefault(); drawing = true; const p = getPos(e); erase(p.x, p.y); checkProgress(); };
+  const move = (e)=>{ if(!drawing) return; e.preventDefault(); const p = getPos(e); erase(p.x, p.y); checkProgress(); };
+  const up = ()=>{ drawing = false; };
+
+  canvas.addEventListener('mousedown', down);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', up);
+  canvas.addEventListener('touchstart', down, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', up);
+}
+
+function showToast(msg, duration=4200){
+  const el = document.createElement('div');
+  el.className = 'toast show';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{
+    el.classList.remove('show');
+    el.classList.add('hide');
+    setTimeout(()=> el.remove(), 450);
+  }, duration);
+}
+
+/* ---------------- confetti ---------------- */
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+resizeCanvas();
+addEventListener('resize', resizeCanvas);
+
+function burstConfetti(hex){
+  const particles = [];
+  const colors = [hex, '#FFC145', '#ffffff'];
+  for(let i=0;i<60;i++){
+    particles.push({
+      x: innerWidth/2, y: innerHeight*0.35,
+      vx: (Math.random()-0.5)*11, vy: Math.random()*-9 - 2,
+      size: Math.random()*6+3, color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360, vr: (Math.random()-0.5)*10, life: 0
+    });
+  }
+  function frame(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = false;
+    particles.forEach(p=>{
+      p.vy += 0.28; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+      if(p.life < 90){
+        alive = true;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle = p.color; ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+        ctx.restore();
+      }
+    });
+    if(alive) requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  frame();
+}
+function burstHeartConfetti(hex){
+  const particles = [];
+  const colors = [hex, '#FFC145', '#ffffff', '#FF8FAF'];
+  for(let i=0;i<55;i++){
+    particles.push({
+      x: innerWidth/2, y: innerHeight*0.32,
+      vx: (Math.random()-0.5)*10, vy: Math.random()*-9 - 3,
+      scale: Math.random()*0.7+0.5, color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360, vr: (Math.random()-0.5)*9, life: 0
+    });
+  }
+  function frame(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = false;
+    particles.forEach(p=>{
+      p.vy += 0.26; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+      if(p.life < 110){
+        alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot*Math.PI/180);
+        ctx.scale(p.scale, p.scale);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.moveTo(0, -3);
+        ctx.bezierCurveTo(-2, -8, -9, -6, -9, -1);
+        ctx.bezierCurveTo(-9, 4, -3, 7, 0, 12);
+        ctx.bezierCurveTo(3, 7, 9, 4, 9, -1);
+        ctx.bezierCurveTo(9, -6, 2, -8, 0, -3);
+        ctx.fill();
+        ctx.restore();
+      }
+    });
+    if(alive) requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  frame();
+}
+
+/* ---------------- floating hearts ambiance ---------------- */
+const heartEmojis = ['💕','💗','💖','❤️','💘'];
+function spawnHeart(){
+  const h = document.createElement('span');
+  h.className = 'floating-heart';
+  h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+  h.style.left = Math.random()*100 + 'vw';
+  h.style.setProperty('--drift', (Math.random()*80-40)+'px');
+  h.style.fontSize = (14 + Math.random()*16) + 'px';
+  const duration = 6 + Math.random()*5;
+  h.style.animationDuration = duration + 's';
+  document.body.appendChild(h);
+  setTimeout(()=> h.remove(), duration*1000 + 200);
+}
+setInterval(spawnHeart, 900);
+for(let i=0;i<3;i++) setTimeout(spawnHeart, i*300);
+
+/* ---------------- name -> personalized welcome ---------------- */
+let herName = '';
+document.getElementById('makeUrlBtn').addEventListener('click', ()=>{
+  const raw = document.getElementById('herName').value.trim();
+  const welcomeLine = document.getElementById('welcomeLine');
+  if(raw){
+    herName = raw;
+    welcomeLine.textContent = `خوش اومدی، ${raw}! این سایت فقط مال خودته 💕`;
+  } else {
+    herName = 'شما';
+    welcomeLine.textContent = 'خوش اومدی! این سایت فقط مال خودته 💕';
+    showToast('درسته اسمتو نمی‌گی، ولی من که بالاخره اسمتو می‌فهمم 😏');
+  }
+  document.getElementById('introStep1').classList.add('hidden');
+  document.getElementById('introStep2').classList.remove('hidden');
+  burstConfetti('#FF5D8F');
+});
+
+/* ---------------- jokes ---------------- */
+const introJokes = [
+  'یه نکته: این سایت مسئولیتی در قبال ضربان قلب شما نمی‌پذیرد 💓',
+  'طبق آخرین آمار، ۱۰۰٪ کسایی که تا اینجا اومدن، کنجکاو شدن. خودتم که می‌دونی.',
+  'این صفحه از نظر علمی هیچ ربطی به علم نداره، فقط دلش می‌خواست خودشو لوس کنه.',
+  'قبل از ادامه: لطفاً موبایلتون رو محکم بگیرید، ممکنه یهو ذوق کنید.',
+  'این سایت با عشق، کافئین، و کمی اضطراب ساخته شده.',
+  'هشدار: ممکنه بعد از این صفحه یه‌کم بیشتر از قبل بهم فکر کنی.',
+  'طراح این سایت قسم خورده که فقط یه‌بار تو عمرش این‌قدر روی یه پروژه وقت گذاشته.',
+  'اگه از این سایت خوشت نیاد، رسماً باید رو سلیقه‌ت شک کنم 😄',
+  'این صفحه ضدآب نیست، پس لطفاً حین دوش گرفتن باز نکن.',
+  'یه اسرار کوچیک: این سایت رو حداقل ۵ بار از اول ساختم تا خوب بشه.'
+];
+let jokeIdx = 0;
+const jokeBtn = document.getElementById('jokeBtn');
+const introJokeEl = document.getElementById('introJoke');
+if(jokeBtn){
+  jokeBtn.addEventListener('click', ()=>{
+    jokeIdx = (jokeIdx+1) % introJokes.length;
+    introJokeEl.textContent = introJokes[jokeIdx];
+  });
+}
+
+const colorJokes = {
+  '#FF5D8F': 'صورتی؟ حدس می‌زنم فیلم‌های عاشقانه رو با پاپ‌کورن اضافه می‌بینی 🍿',
+  '#8E5CF7': 'بنفش انتخاب کردی، یعنی هم رمانتیکی هم یه‌کم مرموز. ترکیب خطرناکیه.',
+  '#3EB4E8': 'آبی یعنی آرومی... ظاهراً. من که هنوز مطمئن نیستم.',
+  '#38C97E': 'سبز؟ باشه، ولی چراغ سبز نشون دادنت رو جدی می‌گیرم‌ها 😏',
+  '#FF9F43': 'نارنجی یعنی پرانرژی. آماده باش، منم همون‌قدر پرانرژی جواب می‌دم.',
+  '#FFD93D': 'زرد یعنی شاد. یا یعنی امروز صبح قهوه‌ت رو خوردی. یکی از این دوتا.',
+  '#2FBFAE': 'فیروزه‌ای، انتخاب باکلاس. خودمم غافلگیر شدم.',
+  '#FF6B6B': 'قرمز؟ رک بگم، منم دقیقاً همین حسو دارم الان.'
+};
+function showColorJoke(hex){
+  const el = document.getElementById('colorJoke');
+  el.textContent = colorJokes[hex] || 'رنگ باکلاسی انتخاب کردی، تبریک می‌گم به ذوقت.';
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+const genreJokes = {
+  pop: 'پاپ؟ حدس می‌زنم تو ماشین بلند بلند می‌خونی، حتی اگه صدات نره رو استریو.',
+  rap: 'رپ فارسی. امیدوارم قافیه‌هات به اندازه‌ی دلبریت خفن نباشه، وگرنه شکست می‌خورم.',
+  sonati: 'سنتی؟ سلیقه‌ی نابیه. من همینجا کلاه از سرم برمی‌دارم (اگه کلاه داشتم).',
+  rock: 'راک؟ باشه ولی این ریتم کوچولو رو با یه گیتار واقعی اشتباه نگیر، هنوز اونجاها نرسیدیم.',
+  lofi: 'لوفای یعنی آدم آرومی هستی که گاهی تو فکر فرو می‌ری. دقیقاً مثل الان که داری به من فکر می‌کنی.',
+  sad: 'غمگین انتخاب کردی وسط یه صفحه‌ی عاشقونه؟ جسارتته، ولی قبوله.'
+};
+function showGenreJoke(id){
+  const el = document.getElementById('genreJoke');
+  el.textContent = genreJokes[id] || 'سلیقه‌ی جالبی داری تو موسیقی.';
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+const finalJokes = [
+  'اگه دیر کنی، طبق قانون همین سایت باید یه بستنی جبران بدی 🍦',
+  'یادت باشه لبخند بزنی، وگرنه الگوریتم دلم بهم می‌ریزه.',
+  'این قرار رسمی تو تقویم دلِ من ثبت شد. غیرقابل کنسله (شوخی کردم، زنگ بزن هماهنگ کنیم).',
+  'حالا که تا اینجا اومدی، رسماً نمی‌تونی بگی زیادی رومانتیک نبودم.'
+];
+
+/* ---------------- yes/no checkpoint ---------------- */
+const noGuiltLines = [
+  'واقعا خوشت نیومد؟ من کلی زحمت کشیدم واسه تو، دلت میاد؟ 🥺',
+  'یه‌بار دیگه فکر کن... واقعاً همینو می‌خوای بگی؟',
+  'باشه بابا، ولی بدون این دکمه هر بار یه‌کم کوچیک‌تر می‌شه ها 😅',
+  'اوکی، ثبت شد که سنگدلی. ولی بازم می‌پرسم.',
+  'یعنی هیچی از این صفحه خوشت نیومد؟ حتی قلب‌های شناور؟',
+  'دارم بهت فرصت دوباره می‌دم، جبران کن 😌',
+  'جدی؟ حتی اون آهنگی که برات ساختم هم خوشت نیومد؟',
+  'باشه ولی یادت باشه این دکمه داره جلوی چشمت آب می‌شه 🫠',
+  'حس می‌کنم دارم با یه منتقد حرفه‌ای طرفم 🧐',
+  'یکم سخت‌گیری نیست؟ من که از خودم راضی بودم.',
+  'اوکی رکورد زدی، هیچ‌کس تا حالا این‌قدر رو دکمه‌ی نه نزده بود.',
+  'لطفاً یه چیزی بگو که دلم آروم بگیره 😔',
+  'باشه، ولی می‌دونی که آخرش «آره» رو می‌زنی، نه؟ 😏',
+  'این دکمه داره از ترس کوچیک می‌شه، رحم کن بهش.'
+];
+let noLinesBag = [];
+function nextNoLine(){
+  if(noLinesBag.length === 0) noLinesBag = [...noGuiltLines].sort(()=> Math.random()-0.5);
+  return noLinesBag.pop();
+}
+let noCount = 0;
+const ynNoBtn = document.getElementById('ynNo');
+const ynYesBtn = document.getElementById('ynYes');
+ynNoBtn.addEventListener('click', ()=>{
+  noCount++;
+  const scale = Math.max(0.35, 1 - noCount*0.13);
+  ynNoBtn.style.transform = `scale(${scale})`;
+  ynNoBtn.style.padding = `${Math.max(6, 15 - noCount*1.5)}px ${Math.max(8, 22 - noCount*2)}px`;
+  ynNoBtn.style.fontSize = `${Math.max(10, 16 - noCount)}px`;
+  showToast(nextNoLine());
+});
+ynYesBtn.addEventListener('click', ()=>{
+  vibrate([100]);
+  showToast('جونمی جون 😍🎉');
+  burstConfetti(getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#FF5D8F');
+  setTimeout(()=> goTo(4), 900);
+});
+
+/* ---------------- color theming ---------------- */
+function hexToHsl(hex){
+  let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){ h=s=0; }
+  else{
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=(g-b)/d+(g<b?6:0); break;
+      case g: h=(b-r)/d+2; break;
+      case b: h=(r-g)/d+4; break;
+    }
+    h/=6;
+  }
+  return [h*360, s*100, l*100];
+}
+function hsl(h,s,l){ return `hsl(${h} ${s}% ${l}%)`; }
+
+function applyColorTheme(hex){
+  const [h,s] = hexToHsl(hex);
+  const root = document.documentElement.style;
+  root.setProperty('--bg', hsl(h, Math.min(s,70), 93));
+  root.setProperty('--bg2', hsl(h, Math.min(s,60), 97));
+  root.setProperty('--accent', hsl(h, Math.max(s,55), 58));
+  root.setProperty('--accent-soft', hsl(h, Math.min(s,70), 88));
+  root.setProperty('--shadow', hsl(h, 70, 60) + '2e');
+  root.setProperty('--ring', hsl(h, 70, 60) + '59');
+  burstConfetti(hex);
+}
+
+const colorOptions = ['#FF5D8F','#8E5CF7','#3EB4E8','#38C97E','#FF9F43','#FFD93D','#2FBFAE','#FF6B6B'];
+const swatchWrap = document.getElementById('swatches');
+colorOptions.forEach(hex=>{
+  const b = document.createElement('button');
+  b.className = 'swatch';
+  b.style.background = hex;
+  b.setAttribute('aria-label', hex);
+  b.onclick = ()=>{
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+    b.classList.add('selected');
+    applyColorTheme(hex);
+    showColorJoke(hex);
+    savedState.color = hex;
+    setTimeout(()=>goTo(2), 1400);
+  };
+  swatchWrap.appendChild(b);
+});
+document.getElementById('customColor').addEventListener('input', (e)=>{
+  applyColorTheme(e.target.value);
+  showColorJoke(e.target.value);
+  savedState.color = e.target.value;
+  setTimeout(()=>goTo(2), 1400);
+});
+
+/* ---------------- music generation (with Iranian-flavored scales + shuffle) ---------------- */
+const genreMeta = [
+  {id:'pop', label:'پاپ'},
+  {id:'rap', label:'رپ فارسی'},
+  {id:'sonati', label:'سنتی'},
+  {id:'rock', label:'راک'},
+  {id:'lofi', label:'لوفای / چیل'},
+  {id:'sad', label:'غمگین'},
+];
+const presets = {
+  pop: [
+    { bpm:120, scale:['D4','Eb4','F4','G4','A4'], pattern:[0,2,3,4,3,2,1,0], caption:'قلبم مثل شهر شلوغه، ولی جاده‌ش فقط سمت تو باز شده' },
+    { bpm:128, scale:['C4','D4','Eb4','G4','A4'], pattern:[0,1,3,4,3,1,2,0], caption:'هر روز صبح دلم یه بهونه‌ی جدید واسه فکر کردن به تو پیدا می‌کنه' },
+    { bpm:116, scale:['E4','F4','G4','A4','B4'], pattern:[0,2,4,2,3,1,0,2], caption:'اگه قرار بود یه آهنگ باشم، همش درباره‌ی چشمای تو می‌نوشتم' },
+  ],
+  rap: [
+    { bpm:92, scale:['C3','D3','Eb3','F3','G3'], pattern:[0,0,2,0,3,0,2,0], caption:'رپ می‌گم ولی قافیه‌ش عشقه، نه ادعا؛ اسمت افتاده رو زبونم، عادته نه اجبار' },
+    { bpm:96, scale:['D3','E3','F3','G3','A3'], pattern:[0,2,0,3,2,0,3,2], caption:'فلوی من تند نیست ولی حرفم رو خطه؛ هرکی بگه بی‌خیالش شو، من رو خطم نیست' },
+    { bpm:88, scale:['A2','C3','D3','E3','G3'], pattern:[0,0,3,2,0,3,0,2], caption:'بیت آرومه ولی پیام واضح: از این‌همه آدم، چشمم فقط رو خط توئه' },
+  ],
+  sonati: [
+    { bpm:78, scale:['D4','E4','F4','G4','A4','C5','D5'], pattern:[0,2,4,3,5,3,2,0], caption:'دلم ترانه‌ی سنتی می‌خواد، تا بشینم و از تو بگم مثل قصه‌های قدیم' },
+  ],
+  rock: [
+    { bpm:142, scale:['E3','G3','A3','B3','E4'], pattern:[0,0,2,2,4,3,2,0], caption:'این ریتم تنده، ولی دل من برای دیدنت تندتره' },
+  ],
+  lofi: [
+    { bpm:74, scale:['A3','C4','E4','G4','A4'], pattern:[0,2,1,3,2,4,1,0], caption:'یه شب آروم، یه فنجون چای، و فکر کردن به تو — همینه لوفای زندگیم' },
+  ],
+  sad: [
+    { bpm:58, scale:['A3','C4','D4','E4','G4'], pattern:[0,1,2,1,3,2,1,0], caption:'غمگین نیستم، فقط دلتنگتم، حتی وقتی کنارتم' },
+  ],
+};
+const variantIndex = { pop:0, rap:0, sonati:0, rock:0, lofi:0, sad:0 };
+
+const genreWrap = document.getElementById('genres');
+let currentLoop = null;
+let toneStarted = false;
+let activeGenreId = null;
+
+genreMeta.forEach(g=>{
+  const b = document.createElement('button');
+  b.className = 'genre-btn';
+  b.textContent = g.label;
+  b.onclick = async ()=>{
+    document.querySelectorAll('.genre-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    savedState.genre = g.label;
+    activeGenreId = g.id;
+    showGenreJoke(g.id);
+    await playGenre(g.id, g.label);
+  };
+  genreWrap.appendChild(b);
+});
+
+async function playGenre(id, label, isShuffle){
+  const np = document.getElementById('nowPlaying');
+  const npText = document.getElementById('nowPlayingText');
+  const lyricBox = document.getElementById('lyricBox');
+  const variant = presets[id][variantIndex[id]];
+
+  lyricBox.textContent = '« ' + variant.caption + ' »';
+  lyricBox.classList.add('show');
+
+  if(window.__toneFailed || typeof Tone === 'undefined'){
+    npText.textContent = (isShuffle ? 'باشه، این یکی چطوره؟ ' : '') + `سبک «${label}» انتخاب شد 🎶`;
+    np.classList.remove('muted');
+    return;
+  }
+  try{
+    if(!toneStarted){ await Tone.start(); toneStarted = true; }
+    if(currentLoop){ currentLoop.stop(); currentLoop.dispose(); Tone.Transport.stop(); Tone.Transport.cancel(); }
+
+    Tone.Transport.bpm.value = variant.bpm;
+    let synth;
+    if(id==='rock'){
+      const dist = new Tone.Distortion(0.35).toDestination();
+      synth = new Tone.PolySynth(Tone.Synth, { oscillator:{type:'sawtooth'}, envelope:{attack:0.01, decay:0.15, sustain:0.2, release:0.3} }).connect(dist);
+    } else if(id==='rap'){
+      const filt = new Tone.Filter(900,'lowpass').toDestination();
+      synth = new Tone.Synth({ oscillator:{type:'square'}, envelope:{attack:0.005, decay:0.25, sustain:0.05, release:0.2} }).connect(filt);
+    } else if(id==='lofi'){
+      const chorus = new Tone.Chorus(3, 2.5, 0.4).toDestination().start();
+      synth = new Tone.FMSynth({ harmonicity:2, modulationIndex:3, envelope:{attack:0.02, decay:0.3, sustain:0.4, release:0.8} }).connect(chorus);
+    } else if(id==='sad'){
+      const verb = new Tone.Reverb(2.2).toDestination();
+      synth = new Tone.Synth({ oscillator:{type:'sine'}, envelope:{attack:0.05, decay:0.4, sustain:0.3, release:1.2} }).connect(verb);
+    } else if(id==='sonati'){
+      const verb2 = new Tone.Reverb(1.4).toDestination();
+      synth = new Tone.PluckSynth({ attackNoise:0.6, dampening:2800, resonance:0.9 }).connect(verb2);
+    } else {
+      synth = new Tone.Synth({ oscillator:{type:'triangle'}, envelope:{attack:0.01, decay:0.2, sustain:0.15, release:0.3} }).toDestination();
+    }
+
+    let step = 0;
+    currentLoop = new Tone.Loop((time)=>{
+      const noteIdx = variant.pattern[step % variant.pattern.length];
+      const note = variant.scale[noteIdx % variant.scale.length];
+      synth.triggerAttackRelease(note, '8n', time);
+      step++;
+    }, '8n').start(0);
+
+    Tone.Transport.start();
+    npText.textContent = (isShuffle ? 'باشه، این یکی چطوره؟ ' : `یه ریتم ${label} برات ساختم... `) + '🎶';
+    np.classList.remove('muted');
+  } catch(err){
+    npText.textContent = `سبک «${label}» انتخاب شد 🎶`;
+    np.classList.remove('muted');
+  }
+}
+
+/* ---------------- mute button (persists across pages) ---------------- */
+let musicMuted = false;
+document.getElementById('muteBtn').addEventListener('click', ()=>{
+  musicMuted = !musicMuted;
+  try{ if(typeof Tone !== 'undefined') Tone.Destination.mute = musicMuted; }catch(e){}
+  document.getElementById('muteBtn').textContent = musicMuted ? '🔇' : '🔊';
+});
+
+/* ---------------- game choice ---------------- */
+document.getElementById('btnPickGame1').addEventListener('click', ()=> goTo(6));
+document.getElementById('btnPickGame2').addEventListener('click', ()=> goTo(7));
+
+/* ---------------- choice-stage live previews ---------------- */
+let previewRAF = null;
+function drawPreview1(ctx, w, h, t){
+  ctx.clearRect(0,0,w,h);
+  const groundY = h*0.78;
+  ctx.fillStyle = '#FFB6C9';
+  ctx.fillRect(0, groundY, w, h-groundY);
+  const cycle = (t % 2200)/2200;
+  const obstacleX = w*0.62;
+  ctx.fillStyle = '#FF5D5D';
+  ctx.beginPath();
+  ctx.moveTo(obstacleX-6, groundY); ctx.lineTo(obstacleX, groundY-14); ctx.lineTo(obstacleX+6, groundY);
+  ctx.closePath(); ctx.fill();
+  const charX = cycle * w;
+  let jump = 0;
+  if(Math.abs(charX - obstacleX) < 26){
+    const local = 1 - Math.abs(charX-obstacleX)/26;
+    jump = Math.sin(local*Math.PI) * 20;
+  }
+  const charY = groundY - 9 - jump;
+  ctx.fillStyle = '#FF5D8F';
+  ctx.beginPath(); ctx.arc(charX, charY, 6.5, 0, Math.PI*2); ctx.fill();
+}
+function drawPreview2(ctx, w, h, t){
+  ctx.clearRect(0,0,w,h);
+  const bowX = w*0.14, bowY = h*0.52;
+  const heartX = w*0.82, heartY = h*0.42;
+  ctx.strokeStyle = '#FF5D8F'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(bowX, bowY, 9, -1.3, 1.3); ctx.stroke();
+  ctx.fillStyle = '#FF3D68';
+  ctx.beginPath(); ctx.arc(heartX-3, heartY, 4, 0, Math.PI*2); ctx.arc(heartX+3, heartY, 4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(heartX-7, heartY+2); ctx.lineTo(heartX, heartY+10); ctx.lineTo(heartX+7, heartY+2); ctx.fill();
+  const cycle = (t % 1600)/1600;
+  if(cycle < 0.85){
+    const arrowX = bowX + (cycle/0.85)*(heartX-bowX);
+    ctx.strokeStyle = '#5A3825'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(arrowX-8, bowY); ctx.lineTo(arrowX, bowY); ctx.stroke();
+  }
+}
+function startPreviews(){
+  const c1 = document.getElementById('previewGame1');
+  const c2 = document.getElementById('previewGame2');
+  if(!c1 || !c2) return;
+  const ctx1 = c1.getContext('2d');
+  const ctx2 = c2.getContext('2d');
+  function loop(t){
+    drawPreview1(ctx1, c1.width, c1.height, t);
+    drawPreview2(ctx2, c2.width, c2.height, t);
+    previewRAF = requestAnimationFrame(loop);
+  }
+  previewRAF = requestAnimationFrame(loop);
+}
+function stopPreviews(){ if(previewRAF) cancelAnimationFrame(previewRAF); previewRAF = null; }
+
+/* ---------------- activity + place chips ---------------- */
+const activities = ['پیتزا 🍕','کباب 🍢','فست‌فود 🍔','غذای ایرانی 🍚','سوشی 🍣','دسر و کیک 🍰'];
+const chipWrap = document.getElementById('activityChips');
+let selectedActivity = null;
+activities.forEach(a=>{
+  const c = document.createElement('button');
+  c.className = 'chip';
+  c.textContent = a;
+  c.onclick = ()=>{
+    document.querySelectorAll('#activityChips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    selectedActivity = a;
+    clearInvalid('activityField');
+  };
+  chipWrap.appendChild(c);
+});
+
+const places = ['کافی‌شاپ ☕','پارک 🌳','کنار دریا/رودخونه 🌊','مرکز خرید 🛍️','یه جای دنج و خلوت 🌙','هرجا تو بگی 💫'];
+const placeChipWrap = document.getElementById('placeChips');
+let selectedPlace = null;
+places.forEach(p=>{
+  const c = document.createElement('button');
+  c.className = 'chip';
+  c.textContent = p;
+  c.onclick = ()=>{
+    document.querySelectorAll('#placeChips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    selectedPlace = p;
+    clearInvalid('placeField');
+  };
+  placeChipWrap.appendChild(c);
+});
+
+const flowers = ['رز 🌹','لاله 🌷','آفتابگردون 🌻','یاس 🤍','ارکیده 🌺','داوودی 🌼'];
+const flowerChipWrap = document.getElementById('flowerChips');
+let selectedFlower = null;
+flowers.forEach(f=>{
+  const c = document.createElement('button');
+  c.className = 'chip';
+  c.textContent = f;
+  c.onclick = ()=>{
+    document.querySelectorAll('#flowerChips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    selectedFlower = f;
+    clearInvalid('flowerField');
+  };
+  flowerChipWrap.appendChild(c);
+});
+
+/* ---------------- state + storage ---------------- */
+const savedState = { color:null, genre:null };
+
+/* ---------------- Jalali date + 24h time selects ---------------- */
+const jalaliMonths = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+function populateDateTimeSelects(){
+  const daySel = document.getElementById('dayInput');
+  const monthSel = document.getElementById('monthInput');
+  const yearSel = document.getElementById('yearInput');
+  const hourSel = document.getElementById('hourInput');
+  const minuteSel = document.getElementById('minuteInput');
+
+  const addPlaceholder = (sel, label)=>{
+    const o = document.createElement('option');
+    o.value = ''; o.textContent = label; o.disabled = true; o.selected = true;
+    sel.appendChild(o);
+  };
+  addPlaceholder(daySel, 'روز');
+  addPlaceholder(monthSel, 'ماه');
+  addPlaceholder(yearSel, 'سال');
+  addPlaceholder(hourSel, 'ساعت');
+  addPlaceholder(minuteSel, 'دقیقه');
+
+  for(let d=1; d<=31; d++){
+    const o = document.createElement('option');
+    o.value = d; o.textContent = d;
+    daySel.appendChild(o);
+  }
+  jalaliMonths.forEach(m=>{
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    monthSel.appendChild(o);
+  });
+  for(let y=1404; y<=1407; y++){
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    yearSel.appendChild(o);
+  }
+  for(let h=0; h<24; h++){
+    const o = document.createElement('option');
+    const v = String(h).padStart(2,'0');
+    o.value = v; o.textContent = v;
+    hourSel.appendChild(o);
+  }
+  for(let m=0; m<60; m+=5){
+    const o = document.createElement('option');
+    const v = String(m).padStart(2,'0');
+    o.value = v; o.textContent = v;
+    minuteSel.appendChild(o);
+  }
+}
+populateDateTimeSelects();
+['dayInput','monthInput','yearInput'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', ()=> clearInvalid('dateField'));
+});
+['hourInput','minuteInput'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', ()=> clearInvalid('timeField'));
+});
+
+/* ---------------- Jalali -> Gregorian conversion (for countdown) ---------------- */
+const JalaliConv = (function(){
+  function div(a,b){ return ~~(a/b); }
+  function mod(a,b){ return a - ~~(a/b)*b; }
+  function jalCal(jy){
+    const breaks=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+    const bl=breaks.length; let gy=jy+621, leapJ=-14, jp=breaks[0], jm=0, jump=0, n;
+    for(let i=1;i<bl;i++){ jm=breaks[i]; jump=jm-jp; if(jy<jm) break; leapJ=leapJ+div(jump,33)*8+div(mod(jump,33),4); jp=jm; }
+    n=jy-jp;
+    leapJ=leapJ+div(n,33)*8+div(mod(n,33)+3,4);
+    if(mod(jump,33)===4 && jump-n===4) leapJ+=1;
+    const leapG=div(gy,4)-div((div(gy,100)+1)*3,4)-150;
+    const march=20+leapJ-leapG;
+    return { gy: gy, march: march };
+  }
+  function g2d(gy,gm,gd){
+    let d = div((gy+div(gm-8,6)+100100)*1461,4) + div(153*mod(gm+9,12)+2,5) + gd - 34840408;
+    d = d - div(div(gy+100100+div(gm-8,6),100)*3,4) + 752;
+    return d;
+  }
+  function j2d(jy,jm,jd){
+    const r=jalCal(jy);
+    return g2d(r.gy,3,r.march) + (jm-1)*31 - div(jm,7)*(jm-7) + jd - 1;
+  }
+  function d2g(jdn){
+    let j=4*jdn+139361631;
+    j=j+div(div(4*jdn+183187720,146097)*3,4)*4-3908;
+    const i=div(mod(j,1461),4)*5+308;
+    const gd=div(mod(i,153),5)+1;
+    const gm=mod(div(i,153),12)+1;
+    const gy=div(j,1461)-100100+div(8-gm,6);
+    return {gy:gy, gm:gm, gd:gd};
+  }
+  return { toGregorian: function(jy,jm,jd){ return d2g(j2d(jy,jm,jd)); } };
+})();
+
+let countdownTimer = null;
+function startCountdown(targetDate){
+  clearInterval(countdownTimer);
+  const el = document.getElementById('countdownDisplay');
+  function tick(){
+    const now = new Date();
+    let diff = targetDate - now;
+    if(diff <= 0){
+      el.textContent = 'وقتشه! امیدوارم دیگه رسیده باشی 😍';
+      clearInterval(countdownTimer);
+      return;
+    }
+    const days = Math.floor(diff/86400000); diff -= days*86400000;
+    const hours = Math.floor(diff/3600000); diff -= hours*3600000;
+    const minutes = Math.floor(diff/60000); diff -= minutes*60000;
+    const seconds = Math.floor(diff/1000);
+    el.textContent = `تا دیدنت ${days} روز و ${hours} ساعت و ${minutes} دقیقه و ${seconds} ثانیه مونده ⏳`;
+  }
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+const SUPABASE_URL = "https://atkigrrrvnhkxfehbsbp.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0a2lncnJydm5oa3hmZWhic2JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MTExMjcsImV4cCI6MjEwNjI4NzEyN30.Evwzb58R3792-hr8wA-8tSWtQiRoWmNpxUX0pdB6STA";
+
+async function saveToSupabase(data){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/date_data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(data)
+    });
+    if(!res.ok) console.error('supabase error', res.status, await res.text());
+    return res.ok;
+  } catch(err){
+    console.error('supabase request failed', err);
+    return false;
+  }
+}
+
+async function submitDate(){
+  if(!selectedActivity){ vibrate([40]); markInvalid('activityField'); showToast('آخه مگه می‌شه با تو باشم و هیچی نخوریم؟ یکی رو انتخاب کن 😋'); return; }
+  if(!selectedPlace){ vibrate([40]); markInvalid('placeField'); showToast('بدون اینکه بدونم کجا می‌ریم که نمی‌شه نقشه کشید، یه جا رو انتخاب کن 🗺️'); return; }
+  if(!selectedFlower){ vibrate([40]); markInvalid('flowerField'); showToast('مگه آدم دلش میاد واسه تو گل نخره؟ بگو کدوم گلو دوست داری 🌷'); return; }
+
+  const day = document.getElementById('dayInput').value;
+  const month = document.getElementById('monthInput').value;
+  const year = document.getElementById('yearInput').value;
+  const hour = document.getElementById('hourInput').value;
+  const minute = document.getElementById('minuteInput').value;
+  const note = document.getElementById('noteInput').value;
+
+  if(!day || !month || !year){ vibrate([40]); markInvalid('dateField'); showToast('بدون تاریخ که نمی‌شه منتظرت موند، یه روز رو مشخص کن 📅'); return; }
+  if(hour === '' || minute === ''){ vibrate([40]); markInvalid('timeField'); showToast('ساعتشو نگی، از صبح تا شب منتظرت می‌مونم! یه ساعت انتخاب کن ⏰'); return; }
+
+  const date = `${day} ${month} ${year}`;
+  const time = `${hour}:${minute}`;
+
+  // ارسال اطلاعات به Supabase (جدول date_data)
+  const payload = {
+    name: herName || '',
+    food: selectedActivity,
+    place: selectedPlace,
+    flower: selectedFlower,
+    date,
+    time,
+    description: (note == "" || note === null || note === " ") ? "-" : note ,
+    social_info: '-'
+  };
+  const btn = document.querySelector('.stage[data-stage="8"] .btn');
+  const btnLabel = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = 'بزار ببینم'; }
+  const saved = await saveToSupabase(payload);
+  if(btn){ btn.disabled = false; btn.textContent = btnLabel; }
+  if(!saved){
+    vibrate([40]);
+    showToast('یه مشکلی پیش اومد و اطلاعات ذخیره نشد، یه بار دیگه امتحان کن 🙏');
+    return;
+  }
+
+  burstHeartConfetti(getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#FF5D8F');
+  vibrate([60]);
+  document.getElementById('doneTitle').textContent = (herName && herName !== 'شما') ? `مبارکه، ${herName} خانوم!` : 'مبارکه';
+  document.getElementById('finalJoke').textContent = 'اگه دیر کنی، طبق قانون همین سایت باید یه بستنی جبران بدی 🍦';
+
+  try{
+    const jm = jalaliMonths.indexOf(month) + 1;
+    const g = JalaliConv.toGregorian(parseInt(year), jm, parseInt(day));
+    const target = new Date(g.gy, g.gm-1, g.gd, parseInt(hour), parseInt(minute), 0);
+    startCountdown(target);
+  } catch(e){
+    document.getElementById('countdownDisplay').textContent = '';
+  }
+
+  goTo(9);
+}
+
+/* ---------------- contact (id/phone) opt-in ---------------- */
+document.getElementById('showContactFieldBtn').addEventListener('click', ()=>{
+  document.getElementById('contactAsk').classList.add('hidden');
+  document.getElementById('contactForm').classList.remove('hidden');
+});
+document.getElementById('sendContactBtn').addEventListener('click', async ()=>{
+  const val = document.getElementById('contactInput').value.trim();
+  if(!val){ showToast('یه چیزی بنویس دیگه 🙂'); return; }
+  const sendBtn = document.getElementById('sendContactBtn');
+  sendBtn.disabled = true;
+  const saved = await saveToSupabase({
+    name: herName || '-',
+    food: '-',
+    place: '-',
+    flower: '-',
+    date: '-',
+    time: '-',
+    description: '-',
+    social_info: val
+  });
+  sendBtn.disabled = false;
+  if(!saved){
+    vibrate([40]);
+    showToast('یه مشکلی پیش اومد و ارسال نشد، یه بار دیگه امتحان کن 🙏');
+    return;
+  }
+  document.getElementById('contactForm').classList.add('hidden');
+  showToast('دوست دارم 😍');
+});
+
+/* ---------------- admin panel (for you, not her) ---------------- */
+let gearClicks = 0, gearTimer = null;
+document.getElementById('adminGear').addEventListener('click', ()=>{
+  gearClicks++;
+  clearTimeout(gearTimer);
+  gearTimer = setTimeout(()=>{ gearClicks = 0; }, 1200);
+  if(gearClicks >= 3){ gearClicks = 0; openPinModal(); }
+});
+
+/* ---------------- 4-digit PIN gate for admin panel ---------------- */
+const ADMIN_PIN = '9192';
+const pinInputs = [1,2,3,4].map(i => document.getElementById('pin'+i));
+function openPinModal(){
+  pinInputs.forEach(inp => inp.value = '');
+  document.getElementById('pinModal').classList.remove('hidden');
+  pinInputs[0].focus();
+}
+function closePinModal(){ document.getElementById('pinModal').classList.add('hidden'); }
+pinInputs.forEach((inp, idx)=>{
+  inp.addEventListener('input', ()=>{
+    inp.value = inp.value.replace(/[^0-9]/g, '').slice(0,1);
+    if(inp.value && idx < pinInputs.length-1) pinInputs[idx+1].focus();
+  });
+  inp.addEventListener('keydown', (e)=>{
+    if(e.key === 'Backspace' && !inp.value && idx > 0) pinInputs[idx-1].focus();
+    if(e.key === 'Enter') document.getElementById('pinSubmitBtn').click();
+  });
+});
+document.getElementById('pinSubmitBtn').addEventListener('click', ()=>{
+  const entered = pinInputs.map(i => i.value).join('');
+  if(entered === ADMIN_PIN){
+    closePinModal();
+    openAdmin();
+  } else {
+    pinInputs.forEach(inp=>{
+      inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+      inp.value = '';
+    });
+    pinInputs[0].focus();
+  }
+});
+document.getElementById('pinCancelBtn').addEventListener('click', closePinModal);
+
+async function openAdmin(){
+  const modal = document.getElementById('adminModal');
+  const list = document.getElementById('adminList');
+  const contactList = document.getElementById('adminContactList');
+  list.innerHTML = '<p class="empty-note">در حال بارگذاری...</p>';
+  contactList.innerHTML = '';
+  modal.classList.remove('hidden');
+  await renderResponses();
+  await renderContacts();
+}
+async function renderResponses(){
+  const list = document.getElementById('adminList');
+  try{
+    const res = await window.storage.list('confession-response-', true);
+    const keys = (res && res.keys) ? res.keys : [];
+    if(keys.length === 0){ list.innerHTML = '<p class="empty-note">هنوز جوابی ثبت نشده.</p>'; return; }
+    const items = [];
+    for(const k of keys){
+      try{ const r = await window.storage.get(k, true); if(r && r.value) items.push({key:k, data:JSON.parse(r.value)}); } catch(e){}
+    }
+    items.sort((a,b)=> new Date(b.data.submittedAt) - new Date(a.data.submittedAt));
+    list.innerHTML = items.map(({key, data:it}) => `
+      <div class="resp-item">
+        <button class="btn-delete-one" onclick="deleteResponse('${key}')" title="حذف">🗑</button>
+        <div><b>اسم:</b> ${it.name}</div>
+        <div><b>چی بخوریم:</b> ${it.activity}</div>
+        <div><b>کجا:</b> ${it.place || '—'}</div>
+        <div><b>گل موردعلاقه:</b> ${it.flower || '—'}</div>
+        <div><b>تاریخ:</b> ${it.date} — <b>ساعت:</b> ${it.time}</div>
+        <div><b>رنگ انتخابی:</b> ${it.color} &nbsp; <b>سبک موزیک:</b> ${it.genre}</div>
+        ${it.note ? `<div><b>پیام:</b> ${it.note}</div>` : ''}
+      </div>
+    `).join('');
+  } catch(err){ list.innerHTML = '<p class="empty-note">مشکلی تو خوندن اطلاعات پیش اومد.</p>'; }
+}
+async function renderContacts(){
+  const contactList = document.getElementById('adminContactList');
+  try{
+    const res2 = await window.storage.list('confession-contact-', true);
+    const keys2 = (res2 && res2.keys) ? res2.keys : [];
+    if(keys2.length === 0){ contactList.innerHTML = '<p class="empty-note">هنوز چیزی فرستاده نشده.</p>'; return; }
+    const items2 = [];
+    for(const k of keys2){
+      try{ const r = await window.storage.get(k, true); if(r && r.value) items2.push({key:k, data:JSON.parse(r.value)}); } catch(e){}
+    }
+    items2.sort((a,b)=> new Date(b.data.submittedAt) - new Date(a.data.submittedAt));
+    contactList.innerHTML = items2.map(({key, data:it}) => `
+      <div class="resp-item">
+        <button class="btn-delete-one" onclick="deleteContact('${key}')" title="حذف">🗑</button>
+        <div><b>اسم:</b> ${it.name}</div><div><b>آیدی/شماره:</b> ${it.contact}</div>
+      </div>
+    `).join('');
+  } catch(err){ contactList.innerHTML = '<p class="empty-note">مشکلی پیش اومد.</p>'; }
+}
+async function deleteResponse(key){
+  try{ await window.storage.delete(key, true); } catch(e){}
+  renderResponses();
+}
+async function deleteContact(key){
+  try{ await window.storage.delete(key, true); } catch(e){}
+  renderContacts();
+}
+async function deleteAllOfPrefix(prefix){
+  try{
+    const res = await window.storage.list(prefix, true);
+    const keys = (res && res.keys) ? res.keys : [];
+    for(const k of keys){ try{ await window.storage.delete(k, true); } catch(e){} }
+  } catch(e){}
+}
+document.getElementById('deleteAllResponsesBtn').addEventListener('click', async ()=>{
+  if(!confirm('همه‌ی جواب‌های قرار حذف بشن؟')) return;
+  await deleteAllOfPrefix('confession-response-');
+  renderResponses();
+});
+document.getElementById('deleteAllContactsBtn').addEventListener('click', async ()=>{
+  if(!confirm('همه‌ی آیدی/شماره‌ها حذف بشن؟')) return;
+  await deleteAllOfPrefix('confession-contact-');
+  renderContacts();
+});
+function closeAdmin(){ document.getElementById('adminModal').classList.add('hidden'); }
+
+/* ---------------- mini platformer game ---------------- */
+const GW = 600, GH = 260;
+let gameInited = false;
+let gameRAF = null;
+let gameRunning = false;
+let gState = null;
+
+function initGamePlatforms(){
+  return [
+    {x:0,    w:260, y:210},
+    {x:300,  w:240, y:210},
+    {x:580,  w:260, y:195},
+    {x:880,  w:260, y:210},
+    {x:1180, w:260, y:195},
+    {x:1480, w:260, y:210},
+    {x:1780, w:480, y:210},
+  ];
+}
+function initGameObstacles(){
+  return [
+    {x:150,  y:190, w:20, h:20},
+    {x:430,  y:190, w:20, h:20},
+    {x:700,  y:175, w:20, h:20},
+    {x:1000, y:190, w:20, h:20},
+    {x:1300, y:175, w:20, h:20},
+  ];
+}
+function updateLivesUI(){
+  const lives = Math.max(gState.lives, 0);
+  document.getElementById('gameLives').textContent = '❤️'.repeat(lives) + '🖤'.repeat(3-lives);
+}
+function resetGame(){
+  gState = {
+    x:30, y:150, vx:0, vy:0, w:26, h:34, onGround:false,
+    lives:3, invuln:0, camX:0, frozen:false,
+    lastSafeX:30, lastSafeY:150,
+    platforms: initGamePlatforms(), obstacles: initGameObstacles(),
+    heart: {x:2000, y:178, w:36, h:32, taken:false},
+    won:false, keys:{left:false, right:false},
+  };
+  document.getElementById('btnSkipGame').classList.remove('hidden');
+  updateLivesUI();
+}
+function doJump(){
+  if(gState && gState.onGround && !gState.won && !gState.frozen){ gState.vy = -11.5; gState.onGround = false; }
+}
+function groundYAt(x){
+  for(const p of gState.platforms){ if(x >= p.x && x <= p.x+p.w) return p.y; }
+  return null;
+}
+function handleLifeLoss(){
+  const s = gState;
+  s.lives--; updateLivesUI();
+  if(s.lives <= 0){
+    s.frozen = true;
+    showToast('دوباره تلاش کن، این‌بار محکم‌تر بپر 💪');
+    setTimeout(()=>{ resetGame(); }, 900);
+  } else {
+    s.invuln = 55;
+  }
+}
+const thiefSVG = `<svg class="win-thief" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="110" cy="205" rx="70" ry="10" fill="rgba(0,0,0,0.08)"/>
+  <path d="M60 130 Q60 90 110 90 Q160 90 160 130 L160 190 Q160 205 145 205 L75 205 Q60 205 60 190 Z" fill="#3B3B5C"/>
+  <rect x="72" y="100" width="76" height="18" rx="9" fill="#2A2A45"/>
+  <circle cx="110" cy="80" r="34" fill="#F5C99B"/>
+  <path d="M76 68 Q76 40 110 40 Q144 40 144 68 L144 76 Q130 60 110 60 Q90 60 76 76 Z" fill="#2A2A45"/>
+  <rect x="82" y="70" width="56" height="14" rx="7" fill="#1F1F33"/>
+  <circle cx="96" cy="77" r="3.4" fill="#fff"/>
+  <circle cx="124" cy="77" r="3.4" fill="#fff"/>
+  <path d="M92 100 Q110 110 128 100" stroke="#8a5a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <g transform="translate(78,118) rotate(-12)">
+    <path d="M27 6 C27 -2 17 -6 10 0 C3 -6 -7 -2 -7 6 C-7 16 10 30 10 30 C10 30 27 16 27 6 Z" fill="#FF3D68"/>
+  </g>
+  <path d="M40 150 Q30 130 55 118" stroke="#3B3B5C" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <path d="M180 150 Q190 130 165 118" stroke="#3B3B5C" stroke-width="14" fill="none" stroke-linecap="round"/>
+</svg>`;
+const pierceHeartSVG = `<svg class="win-thief" viewBox="0 0 200 190" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 165 C45 128 15 95 15 60 C15 32 38 12 62 12 C82 12 96 24 100 40 C104 24 118 12 138 12 C162 12 185 32 185 60 C185 95 155 128 100 165 Z" fill="#FF3D68"/>
+  <line x1="10" y1="55" x2="185" y2="90" stroke="#5A3825" stroke-width="7" stroke-linecap="round"/>
+  <polygon points="180,84 198,90 180,96" fill="#333"/>
+  <polygon points="16,49 2,42 6,58" fill="#E1306C"/>
+  <path d="M92 150 q5 14 0 24 q-5 -5 -5 -12 q0 -7 5 -12 Z" fill="#B0002A"/>
+  <path d="M112 156 q5 11 0 20 q-5 -5 -5 -9 q0 -6 5 -11 Z" fill="#B0002A"/>
+</svg>`;
+let lastWonGame = null;
+function showWinOverlay(graphicHTML, text, gameKey){
+  document.getElementById('winGraphicSlot').innerHTML = graphicHTML;
+  document.getElementById('winTextEl').textContent = text;
+  document.getElementById('winContinueBtn').classList.remove('hidden');
+  document.getElementById('winActions').classList.add('hidden');
+  lastWonGame = gameKey;
+  document.getElementById('winOverlay').classList.remove('hidden');
+}
+document.getElementById('winContinueBtn').addEventListener('click', ()=>{
+  document.getElementById('winContinueBtn').classList.add('hidden');
+  document.getElementById('winActions').classList.remove('hidden');
+});
+document.getElementById('winReplayBtn').addEventListener('click', ()=>{
+  document.getElementById('winOverlay').classList.add('hidden');
+  stopGameLoop(); stopArcheryLoop();
+  goTo(5);
+});
+document.getElementById('winNextBtn').addEventListener('click', ()=>{
+  document.getElementById('winOverlay').classList.add('hidden');
+  stopGameLoop(); stopArcheryLoop();
+  goTo(8);
+});
+function winGame(){
+  gState.won = true;
+  stopGameLoop();
+  vibrate([100,50,100,50,150]);
+  burstConfetti('#FF5D8F');
+  document.getElementById('btnSkipGame').classList.add('hidden');
+  showWinOverlay(thiefSVG, 'میدونستی الان قلب منو دزدیدی؟ 💘', 'game1');
+}
+function stepGame(){
+  const s = gState;
+  if(s.won || s.frozen) return;
+  const speed = 3.4;
+  if(s.keys.left) s.vx = -speed;
+  else if(s.keys.right) s.vx = speed;
+  else s.vx = 0;
+
+  s.x += s.vx;
+  s.vy += 0.5;
+  s.y += s.vy;
+
+  const gy = groundYAt(s.x + s.w/2);
+  if(gy !== null && s.y + s.h >= gy && s.vy >= 0){
+    s.y = gy - s.h; s.vy = 0; s.onGround = true;
+    s.lastSafeX = s.x; s.lastSafeY = s.y;
+  } else s.onGround = false;
+
+  if(s.y > GH + 60){
+    handleLifeLoss();
+    if(!gState.frozen){ s.x = s.lastSafeX; s.y = s.lastSafeY; s.vy = 0; }
+  }
+  if(s.invuln > 0) s.invuln--;
+
+  if(s.invuln === 0 && !s.frozen){
+    for(const o of s.obstacles){
+      if(o.dead) continue;
+      if(s.x < o.x+o.w-4 && s.x+s.w > o.x+4 && s.y < o.y+o.h-4 && s.y+s.h > o.y+4){
+        o.dead = true;
+        handleLifeLoss();
+        if(!s.frozen) s.vy = -6;
+        break;
+      }
+    }
+  }
+  if(!s.heart.taken){
+    const h = s.heart;
+    if(s.x < h.x+h.w && s.x+s.w > h.x && s.y < h.y+h.h && s.y+s.h > h.y){ h.taken = true; winGame(); }
+  }
+  if(s.x < 0) s.x = 0;
+  const maxCam = 2260 - GW;
+  s.camX = Math.min(Math.max(s.x - GW/2, 0), Math.max(maxCam,0));
+}
+function drawHeartShape(ctx,x,y,size){
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = '#FF3D68';
+  ctx.beginPath();
+  const w = size, h = size;
+  ctx.moveTo(w/2, h*0.3);
+  ctx.bezierCurveTo(w/2, 0, 0, 0, 0, h*0.3);
+  ctx.bezierCurveTo(0, h*0.6, w/2, h*0.8, w/2, h);
+  ctx.bezierCurveTo(w/2, h*0.8, w, h*0.6, w, h*0.3);
+  ctx.bezierCurveTo(w, 0, w/2, 0, w/2, h*0.3);
+  ctx.fill(); ctx.restore();
+}
+function drawGirl(ctx, x, y, w, h, blinking){
+  if(blinking && Math.floor(Date.now()/80)%2===0) return;
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#FF5D8F';
+  ctx.beginPath();
+  ctx.moveTo(w*0.15, h*0.55); ctx.lineTo(w*0.85, h*0.55); ctx.lineTo(w, h); ctx.lineTo(0, h);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#FFD9B3';
+  ctx.beginPath(); ctx.arc(w/2, h*0.28, w*0.36, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#5A3825';
+  ctx.beginPath(); ctx.ellipse(w*0.85, h*0.22, w*0.16, w*0.24, 0.4, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2B1B2F';
+  ctx.beginPath(); ctx.arc(w*0.4, h*0.27, 1.6, 0, Math.PI*2); ctx.arc(w*0.62, h*0.27, 1.6, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawGame(){
+  const cv = document.getElementById('gameCanvas');
+  const c = cv.getContext('2d');
+  const s = gState;
+  c.clearRect(0,0,GW,GH);
+  const grad = c.createLinearGradient(0,0,0,GH);
+  grad.addColorStop(0,'#FFE3EC'); grad.addColorStop(1,'#FFF6F1');
+  c.fillStyle = grad; c.fillRect(0,0,GW,GH);
+
+  c.save(); c.translate(-s.camX, 0);
+  c.fillStyle = '#FFB6C9';
+  s.platforms.forEach(p=>{ c.fillRect(p.x, p.y, p.w, GH-p.y+40); });
+
+  c.fillStyle = '#FF5D5D';
+  s.obstacles.forEach(o=>{
+    c.beginPath(); c.moveTo(o.x, o.y+o.h); c.lineTo(o.x+o.w/2, o.y); c.lineTo(o.x+o.w, o.y+o.h); c.closePath(); c.fill();
+  });
+
+  if(!s.heart.taken) drawHeartShape(c, s.heart.x, s.heart.y, s.heart.w);
+  drawGirl(c, s.x, s.y, s.w, s.h, s.invuln>0);
+  c.restore();
+}
+function gameLoop(){ stepGame(); drawGame(); if(gameRunning) gameRAF = requestAnimationFrame(gameLoop); }
+function startGameLoop(){ gameRunning = true; if(gameRAF) cancelAnimationFrame(gameRAF); gameLoop(); }
+function stopGameLoop(){ gameRunning = false; if(gameRAF) cancelAnimationFrame(gameRAF); gameRAF = null; }
+
+function initGameControls(){
+  const left = document.getElementById('btnLeft');
+  const right = document.getElementById('btnRight');
+  const jump = document.getElementById('btnJump');
+  const press = (el, key)=>{
+    const down=(e)=>{ e.preventDefault(); gState.keys[key]=true; };
+    const up=(e)=>{ e.preventDefault(); gState.keys[key]=false; };
+    el.addEventListener('touchstart', down); el.addEventListener('touchend', up);
+    el.addEventListener('mousedown', down); el.addEventListener('mouseup', up); el.addEventListener('mouseleave', up);
+  };
+  press(left,'left'); press(right,'right');
+  jump.addEventListener('click', doJump);
+  jump.addEventListener('touchstart', (e)=>{ e.preventDefault(); doJump(); });
+
+  window.addEventListener('keydown', (e)=>{
+    if(!gState || gState.won) return;
+    if(e.key==='ArrowLeft') gState.keys.left = true;
+    if(e.key==='ArrowRight') gState.keys.right = true;
+    if(e.key===' '||e.key==='ArrowUp') doJump();
+  });
+  window.addEventListener('keyup', (e)=>{
+    if(!gState) return;
+    if(e.key==='ArrowLeft') gState.keys.left = false;
+    if(e.key==='ArrowRight') gState.keys.right = false;
+  });
+
+  document.getElementById('btnSkipGame').addEventListener('click', ()=>{ stopGameLoop(); goTo(8); });
+}
+function ensureGameInit(){
+  if(gameInited) return;
+  gameInited = true;
+  initGameControls();
+  resetGame();
+}
+
+/* ---------------- mini game 2: archery (شکار قلب) ---------------- */
+const AW = 600, AH = 260;
+let archeryInited = false;
+let archeryRAF = null;
+let archeryRunning = false;
+let aState = null;
+
+function resetArchery(){
+  aState = {
+    bow:{x:55, y:AH/2},
+    shotsLeft:5,
+    arrows:[],
+    wallX:300, wallGapHeight:46, wallGapCenter:AH/2, wallDir:1, wallSpeed:0.55,
+    heart:{x:500, y:125, w:34, h:30},
+    dragging:false, dragStart:null, dragCurrent:null,
+    won:false, frozen:false,
+  };
+  updateShotsUI();
+  document.getElementById('btnSkipGame2').classList.remove('hidden');
+}
+function updateShotsUI(){
+  const n = Math.max(aState.shotsLeft, 0);
+  document.getElementById('archeryShots').textContent = '🏹'.repeat(n) + '▫️'.repeat(5-n);
+}
+function stepArchery(){
+  const s = aState;
+  if(s.won || s.frozen) return;
+
+  s.wallGapCenter += s.wallDir * s.wallSpeed;
+  if(s.wallGapCenter < 50 || s.wallGapCenter > AH-50) s.wallDir *= -1;
+
+  s.arrows = s.arrows.filter(a=>{
+    a.vy += 0.28;
+    a.x += a.vx; a.y += a.vy;
+
+    if(a.x >= s.wallX-6 && a.x <= s.wallX+6){
+      const gapTop = s.wallGapCenter - s.wallGapHeight/2;
+      const gapBottom = s.wallGapCenter + s.wallGapHeight/2;
+      if(a.y < gapTop || a.y > gapBottom) return false;
+    }
+
+    const h = s.heart;
+    if(a.x > s.wallX && a.x > h.x-6 && a.x < h.x+h.w+6 && a.y > h.y-6 && a.y < h.y+h.h+6){
+      s.won = true;
+      winArchery();
+      return false;
+    }
+
+    if(a.x > AW+20 || a.y > AH+40 || a.y < -60) return false;
+    return true;
+  });
+
+  if(!s.won && s.shotsLeft <= 0 && s.arrows.length === 0){
+    s.frozen = true;
+    showToast('دوباره تلاش کن، این‌بار بهتر نشونه بگیر 🎯');
+    setTimeout(()=>{ resetArchery(); }, 900);
+  }
+}
+function drawBow(c, x, y, nock){
+  const topTip = {x: x+4, y: y-42};
+  const botTip = {x: x+4, y: y+42};
+  c.lineCap = 'round';
+  c.strokeStyle = '#8a5a2e';
+  c.lineWidth = 7;
+  c.beginPath();
+  c.moveTo(topTip.x, topTip.y);
+  c.bezierCurveTo(x+30, y-32, x+30, y-8, x+8, y);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(x+8, y);
+  c.bezierCurveTo(x+30, y+8, x+30, y+32, botTip.x, botTip.y);
+  c.stroke();
+  c.fillStyle = '#4a2e1a';
+  c.fillRect(x-2, y-13, 11, 26);
+  c.strokeStyle = '#d8cfc4';
+  c.lineWidth = 1.6;
+  c.beginPath();
+  c.moveTo(topTip.x, topTip.y);
+  c.lineTo(nock ? nock.x : x+4, nock ? nock.y : y);
+  c.lineTo(botTip.x, botTip.y);
+  c.stroke();
+}
+function drawArchery(){
+  const cv = document.getElementById('archeryCanvas');
+  const c = cv.getContext('2d');
+  const s = aState;
+  c.clearRect(0,0,AW,AH);
+  const grad = c.createLinearGradient(0,0,0,AH);
+  grad.addColorStop(0,'#FFE3EC'); grad.addColorStop(1,'#FFF6F1');
+  c.fillStyle = grad; c.fillRect(0,0,AW,AH);
+
+  c.strokeStyle = '#c9a27a'; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(s.heart.x+s.heart.w/2, 0); c.lineTo(s.heart.x+s.heart.w/2, s.heart.y); c.stroke();
+  drawHeartShape(c, s.heart.x, s.heart.y, s.heart.w);
+
+  const gapTop = s.wallGapCenter - s.wallGapHeight/2;
+  const gapBottom = s.wallGapCenter + s.wallGapHeight/2;
+  c.fillStyle = '#C9A7B0';
+  c.fillRect(s.wallX-8, 0, 16, gapTop);
+  c.fillRect(s.wallX-8, gapBottom, 16, AH-gapBottom);
+
+  const isAiming = s.dragging && s.dragStart && s.dragCurrent &&
+    Math.hypot(s.dragCurrent.x-s.dragStart.x, s.dragCurrent.y-s.dragStart.y) > 12;
+  drawBow(c, s.bow.x, s.bow.y, isAiming ? s.dragCurrent : null);
+
+  if(isAiming){
+    const dx = s.dragCurrent.x - s.dragStart.x;
+    const dy = s.dragCurrent.y - s.dragStart.y;
+    const dist = Math.hypot(dx,dy);
+    const power = Math.min(dist,110)/110;
+    let vx = -dx/dist*(5+power*7), vy = -dy/dist*(5+power*7);
+    let px = s.bow.x, py = s.bow.y;
+    c.fillStyle = '#9a8890';
+    for(let i=0;i<18;i++){
+      vy += 0.28; px += vx; py += vy;
+      if(i%2===0){ c.beginPath(); c.arc(px,py,2.5,0,Math.PI*2); c.fill(); }
+      if(px > AW || py > AH) break;
+    }
+    const ang = Math.atan2(s.bow.y - s.dragCurrent.y, s.bow.x - s.dragCurrent.x);
+    const shaftLen = 34;
+    c.strokeStyle = '#5A3825'; c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(s.dragCurrent.x, s.dragCurrent.y);
+    c.lineTo(s.dragCurrent.x + Math.cos(ang)*shaftLen, s.dragCurrent.y + Math.sin(ang)*shaftLen);
+    c.stroke();
+  }
+
+  c.strokeStyle = '#5A3825'; c.lineWidth = 3;
+  s.arrows.forEach(a=>{
+    const len = 14;
+    const ang = Math.atan2(a.vy, a.vx);
+    c.beginPath();
+    c.moveTo(a.x - Math.cos(ang)*len, a.y - Math.sin(ang)*len);
+    c.lineTo(a.x, a.y);
+    c.stroke();
+  });
+}
+function archeryLoop(){ stepArchery(); drawArchery(); if(archeryRunning) archeryRAF = requestAnimationFrame(archeryLoop); }
+function startArcheryLoop(){ archeryRunning = true; if(archeryRAF) cancelAnimationFrame(archeryRAF); archeryLoop(); }
+function stopArcheryLoop(){ archeryRunning = false; if(archeryRAF) cancelAnimationFrame(archeryRAF); archeryRAF = null; }
+function winArchery(){
+  stopArcheryLoop();
+  vibrate([100,50,100,50,150]);
+  burstConfetti('#FF3D68');
+  document.getElementById('btnSkipGame2').classList.add('hidden');
+  showWinOverlay(pierceHeartSVG, 'با یه تیر و کمون، دقیقاً زدی وسط قلبم 🏹💘', 'game2');
+}
+function initArcheryControls(){
+  const cv = document.getElementById('archeryCanvas');
+  const getPos = (e)=>{
+    const rect = cv.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x:(clientX-rect.left)*(AW/rect.width), y:(clientY-rect.top)*(AH/rect.height) };
+  };
+  const start = (e)=>{
+    if(!aState || aState.won || aState.frozen || aState.shotsLeft<=0) return;
+    e.preventDefault();
+    aState.dragging = true;
+    aState.dragStart = getPos(e);
+    aState.dragCurrent = aState.dragStart;
+  };
+  const move = (e)=>{
+    if(!aState || !aState.dragging) return;
+    e.preventDefault();
+    aState.dragCurrent = getPos(e);
+  };
+  const end = (e)=>{
+    if(!aState || !aState.dragging) return;
+    aState.dragging = false;
+    const dx = aState.dragCurrent.x - aState.dragStart.x;
+    const dy = aState.dragCurrent.y - aState.dragStart.y;
+    const dist = Math.hypot(dx,dy);
+    if(dist < 12) return;
+    const power = Math.min(dist,110)/110;
+    const vx = -dx/dist*(5+power*7), vy = -dy/dist*(5+power*7);
+    aState.arrows.push({x:aState.bow.x, y:aState.bow.y, vx, vy});
+    aState.shotsLeft--;
+    updateShotsUI();
+  };
+  cv.addEventListener('mousedown', start);
+  cv.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  cv.addEventListener('touchstart', start, {passive:false});
+  cv.addEventListener('touchmove', move, {passive:false});
+  cv.addEventListener('touchend', end);
+  document.getElementById('btnSkipGame2').addEventListener('click', ()=>{ stopArcheryLoop(); goTo(8); });
+}
+function ensureArcheryInit(){
+  if(archeryInited) return;
+  archeryInited = true;
+  initArcheryControls();
+  resetArchery();
+}
+</script>
+</body>
+</html>
